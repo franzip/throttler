@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/franzip/throttler.svg?branch=master)](https://travis-ci.org/franzip/throttler)
+
 # Throttler
 A simple, general purpose, rate limiter and usage tracker library.
 
