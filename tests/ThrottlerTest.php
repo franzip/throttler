@@ -255,6 +255,9 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withDefaults->getComponentCounter('foo'), 0);
         $this->assertTrue(is_float($withDefaults->getTimeStart()));
         $this->assertTrue($withDefaults->stop());
+        $this->assertTrue($withDefaults->resume());
+        $this->assertTrue($withDefaults->isActive());
+        $this->assertTrue($withDefaults->stop());
         $this->assertFalse($withDefaults->stop());
         $this->assertTrue($withDefaults->setName('foo'));
         $this->assertTrue($withDefaults->setGlobalThreshold(50));
@@ -294,6 +297,10 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withComponents->getComponentCounter('foo'), 0);
         $this->assertEquals($withComponents->getComponentCounter('bar'), 0);
         $this->assertTrue(is_float($withComponents->getTimeStart()));
+        $this->assertTrue($withComponents->stop());
+        $this->assertTrue($withComponents->resume());
+        $this->assertFalse($withComponents->resume());
+        $this->assertTrue($withComponents->isActive());
         $this->assertTrue($withComponents->stop());
         $this->assertFalse($withComponents->stop());
         $this->assertTrue($withComponents->setName('foo'));
@@ -472,6 +479,9 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
             $this->assertFalse($withComponents2->updateComponent('foobaz'));
             $this->assertFalse($withComponents2->updateComponent('barfoo'));
         }
+        $this->assertTrue($withComponents2->stop());
+        $this->assertTrue($withComponents2->resume());
+        $this->assertFalse($withComponents2->resume());
         $this->assertTrue($withComponents2->stop());
         $this->assertTrue($withComponents2->setComponentThreshold(1));
         $this->assertTrue($withComponents2->setGlobalThreshold(2));
