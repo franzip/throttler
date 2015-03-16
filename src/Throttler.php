@@ -71,12 +71,13 @@ class Throttler
         // perform basic validation
         self::checkArgs($name, $globalThreshold, $metric, $metricFactor,
                         $componentThreshold, $components);
-        // client supplied vars
+        // instance vars
         $this->name               = $name;
         $this->globalThreshold    = $globalThreshold;
         $this->metric             = $metric;
         $this->metricFactor       = $metricFactor;
         $this->componentThreshold = $componentThreshold;
+
         if (empty($components)) {
             $this->components = $components;
         } else {
@@ -84,6 +85,7 @@ class Throttler
                 $this->components[$component] = 0;
             }
         }
+
         // allow resetting the object to its starting state
         $this->origStatus = array("name"               => $name,
                                   "metric"             => $metric,
@@ -91,7 +93,7 @@ class Throttler
                                   "componentThreshold" => $componentThreshold,
                                   "metricFactor"       => $metricFactor,
                                   "components"         => $components);
-        // instance status
+        // instance statuses
         $this->counter    = null;
         $this->startedAt  = null;
         $this->expiresAt  = null;
@@ -123,6 +125,19 @@ class Throttler
     {
         if ($this->isActive()) {
             $this->turnOff();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Allow resuming after a stop without refreshing the whole instance.
+     * @return bool
+     */
+    public function resume()
+    {
+        if (!$this->isActive()) {
+            $this->turnOn();
             return true;
         }
         return false;
