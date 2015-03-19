@@ -1,6 +1,17 @@
 <?php
 
+/**
+ * Throttler -- Simple rate limiter and usage tracker component.
+ * @version 0.1.0
+ * @author Francesco Pezzella <franzpezzella@gmail.com>
+ * @link https://github.com/franzip/throttler
+ * @copyright Copyright 2015 Francesco Pezzella
+ * @license http://www.opensource.org/licenses/mit-license.php MIT License
+ * @package Throttler
+ */
+
 namespace Franzip\Throttler;
+
 
 /**
  * This class implements a dead simple usage/time tracker.
@@ -16,6 +27,7 @@ namespace Franzip\Throttler;
  * If a threshold is reached, the updateComponent() method will always return false.
  * On each call, updateComponent() checks if the object timespan is elapsed: if
  * it does, a new timespan will be computed and the method will return true.
+ * @package Throttler
  */
 class Throttler
 {
