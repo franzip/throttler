@@ -155,6 +155,12 @@ $throttler->getMetric();
 
 ```
 
+## TODOs
+
+- A decent exceptions system.
+- Move validation to external class.
+- Refactoring messy tests.
+
 ## License
 [MIT](http://opensource.org/licenses/MIT/ "MIT") Public License.
 
