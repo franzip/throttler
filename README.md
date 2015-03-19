@@ -14,7 +14,7 @@ Create a composer.json file in your project root:
 ```
 {
     "require": {
-        "franzip/throttler": "dev-master"
+        "franzip/throttler": "0.1.*@dev"
     }
 }
 ```
