@@ -160,6 +160,8 @@ $throttler->getMetric();
 - A decent exceptions system.
 - Move validation to external class.
 - Refactoring messy tests.
+- Allow bulk adding/updating.
+- Total refactoring update-checking methods.
 
 ## License
 [MIT](http://opensource.org/licenses/MIT/ "MIT") Public License.
