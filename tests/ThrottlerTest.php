@@ -133,6 +133,15 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     {
         $invalidComponents = new Throttler('test', 2, 'hrs', 1, 1, $components = 1);
     }
+
+    /**
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $components: $components entries must be non empty strings.
+     */
+    public function testInvalidComponents2()
+    {
+        $invalidComponents = new Throttler('test', 2, 'hrs', 1, 1, $components = array(1, 2, ''));
+    }
 }
 
 class ThrottleTest extends PHPUnit_Framework_TestCase
@@ -241,9 +250,9 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
                                       $this->args['withDefault'][2]);
         $this->assertFalse($withDefaults->stop());
         $this->assertFalse($withDefaults->start());
-        $this->assertFalse($withDefaults->addComponent(1));
-        $this->assertTrue($withDefaults->addComponent('foo'));
-        $this->assertFalse($withDefaults->addComponent('foo'));
+        $this->assertFalse($withDefaults->addComponents(1));
+        $this->assertTrue($withDefaults->addComponents('foo'));
+        $this->assertFalse($withDefaults->addComponents('foo'));
         $this->assertTrue($withDefaults->start());
         $this->assertEquals($withDefaults->getTimeExpiration(),
                             $withDefaults->getTimeStart() + 60);
@@ -288,7 +297,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withComponents->start());
         $this->assertEquals($withComponents->getTimeExpiration(),
                             $withComponents->getTimeStart() + 120);
-        $this->assertFalse($withComponents->addComponent('foo'));
+        $this->assertFalse($withComponents->addComponents('foo'));
         $this->assertTrue($withComponents->isActive());
         $this->assertEquals($withComponents->getCounter(), 0);
         $this->assertCount(2, $withComponents->getComponents());
@@ -331,7 +340,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
                                       $this->args['withDefault'][2]);
         $this->assertFalse($withDefaults->updateComponent('foo'));
         $this->assertFalse($withDefaults->start());
-        $this->assertTrue($withDefaults->addComponent('foo'));
+        $this->assertTrue($withDefaults->addComponents('foo'));
         $this->assertTrue($withDefaults->start());
         $this->assertFalse($withDefaults->updateComponent('bar'));
         for ($i = 0; $i < $withDefaults->getGlobalThreshold(); $i++)
@@ -343,7 +352,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withDefaults->getComponentCounter('foo'), 2);
         $this->assertEquals($withDefaults->getCounter(), 2);
         $this->assertTrue($withDefaults->stop());
-        $this->assertTrue($withDefaults->addComponent('foobar'));
+        $this->assertTrue($withDefaults->addComponents('foobar'));
         $this->assertTrue($withDefaults->setGlobalThreshold(10));
         $this->assertTrue($withDefaults->start());
         for ($i = 0; $i < $withDefaults->getGlobalThreshold(); $i++)
@@ -373,7 +382,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withComponents->getComponentCounter('foo'), 10);
         $this->assertEquals($withComponents->getComponentCounter('bar'), 1);
         $this->assertTrue($withComponents->stop());
-        $this->assertTrue($withComponents->addComponent('foobar'));
+        $this->assertTrue($withComponents->addComponents('foobar'));
         $this->assertTrue($withComponents->setGlobalThreshold(15));
         $this->assertTrue($withComponents->setComponentThreshold(5));
         $this->assertTrue($withComponents->start());
@@ -420,7 +429,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withComponents->stop());
         $this->assertTrue($withComponents->setComponentThreshold(1));
         $this->assertTrue($withComponents->setGlobalThreshold(2));
-        $this->assertTrue($withComponents->addComponent('foobar'));
+        $this->assertTrue($withComponents->addComponents('foobar'));
         $this->assertTrue($withComponents->start());
         $this->assertTrue($withComponents->updateComponent('foobar'));
         $this->assertFalse($withComponents->updateComponent('foobar'));
@@ -448,7 +457,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withComponents1->stop());
         $this->assertTrue($withComponents1->setComponentThreshold(1));
         $this->assertTrue($withComponents1->setGlobalThreshold(2));
-        $this->assertTrue($withComponents1->addComponent('foobar'));
+        $this->assertTrue($withComponents1->addComponents('foobar'));
         $this->assertTrue($withComponents1->start());
         $this->assertTrue($withComponents1->updateComponent('foobar'));
         $this->assertFalse($withComponents1->updateComponent('foobar'));
@@ -483,7 +492,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withComponents2->stop());
         $this->assertTrue($withComponents2->setComponentThreshold(1));
         $this->assertTrue($withComponents2->setGlobalThreshold(2));
-        $this->assertTrue($withComponents2->addComponent('bazboo'));
+        $this->assertTrue($withComponents2->addComponents('bazboo'));
         $this->assertTrue($withComponents2->start());
         $this->assertTrue($withComponents2->updateComponent('bazboo'));
         $this->assertFalse($withComponents2->updateComponent('bazboo'));
@@ -501,7 +510,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $withDefaults = new Throttler($this->args['withDefault'][0],
                                       $this->args['withDefault'][1],
                                       $this->args['withDefault'][2]);
-        $this->assertTrue($withDefaults->addComponent('foo'));
+        $this->assertTrue($withDefaults->addComponents('foo'));
         $this->assertTrue($withDefaults->setMetric('sec'));
         $this->assertTrue($withDefaults->start());
         $this->assertEquals($withDefaults->getTimeExpiration(),

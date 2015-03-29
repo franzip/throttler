@@ -91,6 +91,7 @@ class Throttler
         $this->metric             = $metric;
         $this->metricFactor       = $metricFactor;
         $this->componentThreshold = $componentThreshold;
+        // initialize components array properly
         $this->setupComponents($components);
         // allow resetting the object to its starting state
         $this->origStatus = array("name"               => $name,
@@ -114,7 +115,8 @@ class Throttler
     public function start()
     {
         // prevent starting if there is nothing to track
-        if ($this->componentsAreSet() && !$this->isActive()) {
+        if (ThrottlerHelper::componentsAreSet($this->components)
+            && !$this->isActive()) {
             $this->turnOn();
             $this->refreshInstance();
             return true;
@@ -196,33 +198,23 @@ class Throttler
     }
 
     /**
-     * TODO
-     * @param [type] $components [description]
+     * Add entries to the components array.
+     * Allow single add (with a string arg) and bulk adding (with an array arg)
+     * @param  string|array $components
+     * @return bool
      */
     public function addComponents($components)
     {
+        // if a string was supplied, check for valid component name
         if (ThrottlerHelper::validateName($components)) {
             $components = array($components);
         }
-        if (is_array($components) && !$this->allInComponents($components)) {
+        // ensure elements to add are not already in components
+        if (is_array($components) && !$this->allInComponents($components) &&
+            ThrottlerHelper::validateComponentsName($components)) {
             for ($i = 0; $i < count($components); $i++) {
-                $this->foo($components[$i]);
+                $this->addComponent($components[$i]);
             }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Add a component to the components array.
-     * @param   string $component
-     * @return  bool
-     */
-    public function addComponent($component)
-    {
-        if (ThrottlerHelper::validateName($component) && !$this->isActive()
-            && !$this->inComponents($component)) {
-            $this->components[$component] = 0;
             return true;
         }
         return false;
@@ -278,8 +270,8 @@ class Throttler
     public function setGlobalThreshold($threshold)
     {
         if (ThrottlerHelper::validateGlobalThreshold($threshold)
-            && !$this->isActive()
-            && $threshold > $this->getComponentThreshold()) {
+            && ThrottlerHelper::compareThresholds($this->getComponentThreshold(), $threshold)
+            && !$this->isActive()) {
             $this->globalThreshold = $threshold;
             return true;
         }
@@ -351,7 +343,7 @@ class Throttler
      */
     public function setComponentThreshold($threshold)
     {
-        if ($threshold < $this->getGlobalThreshold()
+        if (ThrottlerHelper::compareThresholds($threshold, $this->getGlobalThreshold())
             && ThrottlerHelper::validateComponentThreshold($threshold)
             && !$this->isActive()) {
             $this->componentThreshold = $threshold;
@@ -430,7 +422,11 @@ class Throttler
         return microtime(true) > $this->getTimeExpiration();
     }
 
-    private function foo($component)
+    /**
+     * Add a component to the components array
+     * @param string $component
+     */
+    private function addComponent($component)
     {
         $this->components[$component] = 0;
     }
@@ -446,7 +442,7 @@ class Throttler
     }
 
     /**
-     * Check that all components in supplied array are in the instance components.
+     * Check that all components in supplied array are being tracked.
      * @param  array $components
      * @return bool
      */
@@ -544,14 +540,5 @@ class Throttler
                 $this->components[$component] = 0;
             }
         }
-    }
-
-    /**
-     * Check if any components were added.
-     * @return bool
-     */
-    private function componentsAreSet()
-    {
-        return !empty($this->components);
     }
 }
