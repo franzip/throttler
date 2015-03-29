@@ -63,7 +63,7 @@ class Throttler
      * Instantiate a Throttler object.
      * Tracking will NOT be active immediately after the instantiation.
      * If no components to track were provided through the canonical constructor,
-     * at least one component must be added through addComponent() in order to
+     * at least one component must be added through addComponents() in order to
      * turn tracking on.
      * A specific time window can be obtained by setting both $metric and
      * $metricFactor i.e. ('hrs', 24), ('min', 30), ('sec', 30), etc.

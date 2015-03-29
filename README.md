@@ -65,19 +65,30 @@ $throttler = new Throttler('requests', 30, 'hrs');
 $throttler->start();
 
 // Add remote addresses to track...
-$throttler->addComponent('AddressToTrack1');
-$throttler->addComponent('AddressToTrack2');
-$throttler->addComponent('AddressToTrack3');
+$throttler->addComponents('AddressToTrack1');
+$throttler->addComponents('AddressToTrack2');
+$throttler->addComponents('AddressToTrack3');
+// Bulk adding
+$throttler->addComponents(array('AddressToTrack4',
+                                'AddressToTrack5',
+                                'AddressToTrack6',
+                                ...));
 ...
 
 // Start tracking (timeframe starts now)
 $throttler->start();
 
 if ($throttler->updateComponent('AddressToTrack1')) {
-    // handle success
+    // handle update success
 } else {
-    // handle failure
+    // handle update failure
 }
+...
+
+// Remove all stuff to track
+$throttler->stop();
+$throttler->setComponents(array());
+
 ```
 
 
