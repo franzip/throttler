@@ -2,7 +2,7 @@
 
 /**
  * Throttler -- Simple rate limiter and usage tracker component.
- * @version 0.1.0
+ * @version 0.1.1
  * @author Francesco Pezzella <franzpezzella@gmail.com>
  * @link https://github.com/franzip/throttler
  * @copyright Copyright 2015 Francesco Pezzella
@@ -11,9 +11,10 @@
  */
 
 namespace Franzip\Throttler;
-
+use Franzip\Throttler\Helpers\ThrottlerHelper;
 
 /**
+ * TOMODIFY
  * This class implements a dead simple usage/time tracker.
  * Usage is capped with a global threshold and, if supplied, with a component based
  * threshold. In the specified timeframe (1 minute, 30 seconds, etc),
@@ -81,23 +82,16 @@ class Throttler
         // allow case insensitivity
         $metric = strtolower($metric);
         // perform basic validation
-        self::checkArgs($name, $globalThreshold, $metric, $metricFactor,
-                        $componentThreshold, $components);
+        ThrottlerHelper::validateConstructorArgs($name, $globalThreshold, $metric,
+                                                 $metricFactor, $componentThreshold,
+                                                 $components, self::$timeFactor);
         // instance vars
         $this->name               = $name;
         $this->globalThreshold    = $globalThreshold;
         $this->metric             = $metric;
         $this->metricFactor       = $metricFactor;
         $this->componentThreshold = $componentThreshold;
-
-        if (empty($components)) {
-            $this->components = $components;
-        } else {
-            foreach ($components as $component) {
-                $this->components[$component] = 0;
-            }
-        }
-
+        $this->setupComponents($components);
         // allow resetting the object to its starting state
         $this->origStatus = array("name"               => $name,
                                   "metric"             => $metric,
@@ -144,6 +138,7 @@ class Throttler
 
     /**
      * Allow resuming after a stop without refreshing the whole instance.
+     * All the object status will be retained.
      * @return bool
      */
     public function resume()
@@ -207,7 +202,7 @@ class Throttler
      */
     public function addComponent($component)
     {
-        if (self::validName($component) && !$this->isActive()
+        if (ThrottlerHelper::validateName($component) && !$this->isActive()
             && !$this->inComponents($component)) {
             $this->components[$component] = 0;
             return true;
@@ -240,7 +235,7 @@ class Throttler
      */
     public function setName($name)
     {
-        if (self::validName($name) && !$this->isActive()) {
+        if (ThrottlerHelper::validateName($name) && !$this->isActive()) {
             $this->name = $name;
             return true;
         }
@@ -264,7 +259,7 @@ class Throttler
      */
     public function setGlobalThreshold($threshold)
     {
-        if (self::validThreshold($threshold) && !$this->isActive()
+        if (ThrottlerHelper::validateGlobalThreshold($threshold) && !$this->isActive()
             && $threshold > $this->getComponentThreshold()) {
             $this->globalThreshold = $threshold;
             return true;
@@ -288,7 +283,8 @@ class Throttler
      */
     public function setMetric($metric)
     {
-        if (self::validMetric(strtolower($metric)) && !$this->isActive()) {
+        if (ThrottlerHelper::validateMetric($metric, self::$timeFactor)
+            && !$this->isActive()) {
             $this->metric = strtolower($metric);
             return true;
         }
@@ -296,7 +292,7 @@ class Throttler
     }
 
     /**
-     * Metric unit getter
+     * Metric unit getter.
      * @return int
      */
     public function getMetricFactor()
@@ -305,13 +301,13 @@ class Throttler
     }
 
     /**
-     * Metric unit setter
+     * Metric unit setter.
      * @param  int $times
      * @return bool
      */
     public function setMetricFactor($times)
     {
-        if (self::validThreshold($times) && !$this->isActive()) {
+        if (ThrottlerHelper::validateMetricFactor($times) && !$this->isActive()) {
             $this->metricFactor = $times;
             return true;
         }
@@ -330,12 +326,14 @@ class Throttler
     /**
      * Component threshold setter. The $threshold must be smaller than the global
      * threshold.
-     * @param int $threshold
+     * @param   int $threshold
+     * @return  bool
      */
     public function setComponentThreshold($threshold)
     {
         if ($threshold < $this->getGlobalThreshold()
-            && self::validThreshold($threshold) && !$this->isActive()) {
+            && ThrottlerHelper::validateComponentThreshold($threshold)
+            && !$this->isActive()) {
             $this->componentThreshold = $threshold;
             return true;
         }
@@ -353,11 +351,12 @@ class Throttler
 
     /**
      * Components setter.
-     * @param array $components
+     * @param  array $components
+     * @return bool
      */
     public function setComponents($components)
     {
-        if (self::validComponent($components) && !$this->isActive()) {
+        if (ThrottlerHelper::validateComponents($components) && !$this->isActive()) {
             $this->components = $components;
             return true;
         }
@@ -383,7 +382,7 @@ class Throttler
     }
 
     /**
-     * Time expiration getter
+     * Time expiration getter.
      * @return float.
      */
     public function getTimeExpiration()
@@ -392,7 +391,7 @@ class Throttler
     }
 
     /**
-     * Check if the time frame is expired
+     * Check if the computed timeframe is expired.
      * @return bool
      */
     public function timeExpired()
@@ -401,7 +400,7 @@ class Throttler
     }
 
     /**
-     * Get the counter for a given component
+     * Get the counter for a given component.
      * @param  string $component
      * @return int
      */
@@ -411,7 +410,8 @@ class Throttler
     }
 
     /**
-     * Check if a given component is being tracked
+     * Check if a given component is being tracked.
+     * @param  string $component
      * @return bool
      */
     private function inComponents($component)
@@ -428,7 +428,7 @@ class Throttler
     }
 
     /**
-     * Increase the counter for a given component
+     * Increase the counter for a given component.
      * @param  string $component
      */
     private function increaseComponentCounter($component)
@@ -453,7 +453,7 @@ class Throttler
     }
 
     /**
-     * Check the tracked components to see if an update is allowed
+     * Check the tracked components to see if an update is allowed.
      * @param  string $component
      * @return bool
      */
@@ -468,7 +468,7 @@ class Throttler
     }
 
     /**
-     * Compute expiration date
+     * Compute expiration date.
      * @return float
      */
     private function computeExpiration()
@@ -485,105 +485,38 @@ class Throttler
         $this->counter    = 0;
         $this->startedAt  = microtime(true);
         $this->expiresAt  = $this->computeExpiration();
-        $this->setUpComponents();
+        $this->setUpComponents($this->components);
     }
 
     /**
-     * Set up individual counters.
+     * Set up the components counter array.
+     * This is a bit hacky since $components can be an empty array or a sequential
+     * array (on instantiation) and an associative one (when the object has been
+     * already started).
+     * @param array $components
      */
-    private function setUpComponents()
+    private function setUpComponents($components)
     {
-        foreach ($this->components as $component => $value) {
-            $this->components[$component] = 0;
+        if (empty($components)) {
+            $this->components = $components;
+        } elseif (array_keys($components) === range(0, count($components) - 1)) {
+            for ($i = 0; $i < count($components); $i++) {
+                $this->components[$components[$i]] = 0;
+            }
+        } else {
+            foreach ($components as $component => $value) {
+                $this->components[$component] = 0;
+            }
         }
     }
 
     /**
      * Check if any components were added.
-     * @param  array $components
      * @return bool
      */
     private function componentsAreSet()
     {
-        return self::validComponent($this->components)
+        return ThrottlerHelper::validateComponents($this->components)
                && !empty($this->components);
-    }
-
-    /**
-     * Validate name or components name.
-     * @param  string $name
-     * @return bool
-     */
-    private static function validName($name)
-    {
-        return !empty($name) && is_string($name);
-    }
-
-    /**
-     * Validate threshold.
-     * @param  int $threshold
-     * @return bool
-     */
-    private static function validThreshold($threshold)
-    {
-        if (is_int($threshold) && $threshold > 0)
-            return true;
-        return false;
-    }
-
-    /**
-     * Validate time metric.
-     * @param  int $metric
-     * @return bool
-     */
-    private static function validMetric($metric)
-    {
-        if (array_key_exists($metric, self::$timeFactor))
-            return true;
-        return false;
-    }
-
-    /**
-     * Validate components.
-     * @param  array $components
-     * @return bool
-     */
-    private static function validComponent($components)
-    {
-        return is_array($components);
-    }
-
-    /**
-     * Perform global validation before instantiating the object.
-     * @param  string $name
-     * @param  int    $globalThreshold
-     * @param  string $metric
-     * @param  int    $metricFactor
-     * @param  int    $componentThreshold
-     * @param  array  $components
-     */
-    private static function checkArgs($name, $globalThreshold, $metric,
-                                      $metricFactor, $componentThreshold, $components)
-    {
-        if (!self::validName($name))
-            throw new \InvalidArgumentException('$name must be a non empty string.');
-
-        if (!self::validThreshold($globalThreshold))
-            throw new \InvalidArgumentException('$globalThreshold must be an integer greater than 0');
-
-        if (!self::validMetric($metric))
-            throw new \InvalidArgumentException('$metric must be "sec", "min" or "hrs".');
-
-        if (!self::validThreshold($metricFactor))
-            throw new \InvalidArgumentException('$metricFactor must be an integer greater than 0');
-
-        if (isset($componentThreshold) && !self::validThreshold($componentThreshold))
-            throw new \InvalidArgumentException('$componentThreshold must be a positive integer.');
-
-        if (!self::validComponent($components))
-            throw new \InvalidArgumentException('$components must be an array.');
-
-        if ($componentThreshold > $globalThreshold)
-            throw new \InvalidArgumentException('$componentThreshold cannot be greater than $globalThreshold');
     }
 }

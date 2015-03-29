@@ -1,0 +1,131 @@
+<?php
+
+/**
+ * Throttler -- Simple rate limiter and usage tracker component.
+ * @version 0.1.1
+ * @author Francesco Pezzella <franzpezzella@gmail.com>
+ * @link https://github.com/franzip/throttler
+ * @copyright Copyright 2015 Francesco Pezzella
+ * @license http://www.opensource.org/licenses/mit-license.php MIT License
+ * @package Throttler
+ */
+
+namespace Franzip\Throttler\Helpers;
+
+/**
+ * Namespace various Throttler helper methods.
+ * @package Throttler
+ */
+class ThrottlerHelper
+{
+    /**
+     * Validate Throttler constructor args.
+     * @param  string $name
+     * @param  int    $globalThreshold
+     * @param  string $metric
+     * @param  int    $metricFactor
+     * @param  int    $componentThreshold
+     * @param  array  $components
+     */
+    public function validateConstructorArgs($name, $globalThreshold, $metric,
+                                            $metricFactor, $componentThreshold,
+                                            $components, $validMetrics)
+    {
+        if (!self::validateName($name)) {
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $name: please supply a valid non-empty string.');
+        }
+        if (!self::validateGlobalThreshold($globalThreshold)) {
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $globalThreshold: please supply a positive integer.');
+        }
+        if (!self::validateMetric($metric, $validMetrics)) {
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $metric. Valid choices are "sec", "min", "hrs".');
+        }
+        if (!self::validateMetricFactor($metricFactor)) {
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $metricFactor: please supply a positive integer.');
+        }
+        if (!self::validateComponentThreshold($componentThreshold)) {
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $componentThreshold: please supply a positive integer or null.');
+        }
+        if (!self::compareThresholds($componentThreshold, $globalThreshold)) {
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $componentThreshold: $componentThreshold must be lower than $globalThreshold.');
+
+        }
+        if (!self::validateComponents($components)) {
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $components: $components must be an array.');
+        }
+    }
+
+    /**
+     * Validate Throttler name.
+     * @param  string $name
+     * @return bool
+     */
+    public function validateName($name)
+    {
+        return is_string($name) && !empty($name);
+    }
+
+    /**
+     * Validate Throttler global threshold.
+     * @param  int $globalThreshold
+     * @return bool
+     */
+    public function validateGlobalThreshold($globalThreshold)
+    {
+        return is_int($globalThreshold) && $globalThreshold > 0;
+    }
+
+    /**
+     * Validate Throttler metric against an array of supported metrics.
+     * @param  string $metric
+     * @param  array  $validMetrics
+     * @return bool
+     */
+    public function validateMetric($metric, $validMetrics)
+    {
+        return array_key_exists(strtolower($metric), $validMetrics);
+    }
+
+    /**
+     * Validate Throttler metric factor.
+     * @param  int $metricFactor
+     * @return bool
+     */
+    public function validateMetricFactor($metricFactor)
+    {
+        return is_int($metricFactor) && $metricFactor > 0;
+    }
+
+    /**
+     * Validate Throttler components threshold.
+     * @param  int|null $componentThreshold
+     * @return bool
+     */
+    public function validateComponentThreshold($componentThreshold)
+    {
+        return ($componentThreshold == null) || (is_int($componentThreshold) && $componentThreshold > 0);
+    }
+
+    /**
+     * Ensure Throttler per-component threshold is lower than the global threshold.
+     * @param  int $componentThreshold
+     * @param  int $globalThreshold
+     * @return bool
+     */
+    public function compareThresholds($componentThreshold, $globalThreshold)
+    {
+        return $componentThreshold < $globalThreshold;
+    }
+
+    /**
+     * Validate Throttler components array.
+     * @param  array $components
+     * @return bool
+     */
+    public function validateComponents($components)
+    {
+        return is_array($components);
+    }
+
+    private function __construct() {}
+}

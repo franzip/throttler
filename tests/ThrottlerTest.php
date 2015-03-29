@@ -6,10 +6,9 @@ use \PHPUnit_Framework_TestCase as PHPUnit_Framework_TestCase;
 
 class ExceptionsTest extends PHPUnit_Framework_TestCase
 {
-
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $name must be a non empty string.
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $name: please supply a valid non-empty string.
      */
     public function testVoidName()
     {
@@ -17,8 +16,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $name must be a non empty string.
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $name: please supply a valid non-empty string.
      */
     public function testNullName()
     {
@@ -26,8 +25,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $name must be a non empty string.
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $name: please supply a valid non-empty string.
      */
     public function testInvalidName()
     {
@@ -35,8 +34,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $globalThreshold must be an integer greater than 0
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $globalThreshold: please supply a positive integer.
      */
     public function testInvalidGlobalThreshold()
     {
@@ -44,8 +43,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $globalThreshold must be an integer greater than 0
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $globalThreshold: please supply a positive integer.
      */
     public function testInvalidGlobalThreshold1()
     {
@@ -53,8 +52,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $metric must be "sec", "min" or "hrs".
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $metric. Valid choices are "sec", "min", "hrs".
      */
     public function testInvalidMetric()
     {
@@ -62,8 +61,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $metric must be "sec", "min" or "hrs".
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $metric. Valid choices are "sec", "min", "hrs".
      */
     public function testInvalidMetric1()
     {
@@ -71,8 +70,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $metricFactor must be an integer greater than 0
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $metricFactor: please supply a positive integer.
      */
     public function testinvalidMetricTimes()
     {
@@ -80,8 +79,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $metricFactor must be an integer greater than 0
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $metricFactor: please supply a positive integer.
      */
     public function testinvalidMetricTimes1()
     {
@@ -89,8 +88,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $componentThreshold must be a positive integer.
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $componentThreshold: please supply a positive integer or null.
      */
     public function testInvalidComponentThreshold()
     {
@@ -99,8 +98,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $componentThreshold must be a positive integer.
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $componentThreshold: please supply a positive integer or null.
      */
     public function testInvalidComponentThreshold1()
     {
@@ -109,8 +108,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $componentThreshold cannot be greater than $globalThreshold
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $componentThreshold: $componentThreshold must be lower than $globalThreshold.
      */
     public function testInvalidComponentThreshold2()
     {
@@ -118,8 +117,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $components must be an array.
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $components: $components must be an array.
      */
     public function testInvalidComponents()
     {
@@ -127,8 +126,8 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage $components must be an array.
+     * @expectedException        \Franzip\Throttler\Exceptions\InvalidArgumentException
+     * @expectedExceptionMessage Invalid Throttler $components: $components must be an array.
      */
     public function testInvalidComponents1()
     {
@@ -144,7 +143,6 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
     {
         $withDefaults   = array('test', 2, 'min');
         $withComponents = array('test', 11, 'MIn', 2, 10, array('foo', 'bar'));
-
         $this->args = array('withDefault'    => $withDefaults,
                             'withComponents' => $withComponents);
     }
