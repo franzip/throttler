@@ -27,7 +27,7 @@ class ThrottlerHelper
      * @param  int    $componentThreshold
      * @param  array  $components
      */
-    public function validateConstructorArgs($name, $globalThreshold, $metric,
+    public static function validateConstructorArgs($name, $globalThreshold, $metric,
                                             $metricFactor, $componentThreshold,
                                             $components, $validMetrics)
     {
@@ -60,7 +60,7 @@ class ThrottlerHelper
      * @param  string $name
      * @return bool
      */
-    public function validateName($name)
+    public static function validateName($name)
     {
         return is_string($name) && !empty($name);
     }
@@ -70,7 +70,7 @@ class ThrottlerHelper
      * @param  int $globalThreshold
      * @return bool
      */
-    public function validateGlobalThreshold($globalThreshold)
+    public static function validateGlobalThreshold($globalThreshold)
     {
         return is_int($globalThreshold) && $globalThreshold > 0;
     }
@@ -81,7 +81,7 @@ class ThrottlerHelper
      * @param  array  $validMetrics
      * @return bool
      */
-    public function validateMetric($metric, $validMetrics)
+    public static function validateMetric($metric, $validMetrics)
     {
         return array_key_exists(strtolower($metric), $validMetrics);
     }
@@ -91,7 +91,7 @@ class ThrottlerHelper
      * @param  int $metricFactor
      * @return bool
      */
-    public function validateMetricFactor($metricFactor)
+    public static function validateMetricFactor($metricFactor)
     {
         return is_int($metricFactor) && $metricFactor > 0;
     }
@@ -101,7 +101,7 @@ class ThrottlerHelper
      * @param  int|null $componentThreshold
      * @return bool
      */
-    public function validateComponentThreshold($componentThreshold)
+    public static function validateComponentThreshold($componentThreshold)
     {
         return ($componentThreshold == null) || (is_int($componentThreshold) && $componentThreshold > 0);
     }
@@ -112,7 +112,7 @@ class ThrottlerHelper
      * @param  int $globalThreshold
      * @return bool
      */
-    public function compareThresholds($componentThreshold, $globalThreshold)
+    public static function compareThresholds($componentThreshold, $globalThreshold)
     {
         return $componentThreshold < $globalThreshold;
     }
@@ -122,7 +122,7 @@ class ThrottlerHelper
      * @param  array $components
      * @return bool
      */
-    public function validateComponents($components)
+    public static function validateComponents($components)
     {
         return is_array($components);
     }
