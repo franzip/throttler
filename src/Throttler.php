@@ -196,6 +196,24 @@ class Throttler
     }
 
     /**
+     * TODO
+     * @param [type] $components [description]
+     */
+    public function addComponents($components)
+    {
+        if (ThrottlerHelper::validateName($components)) {
+            $components = array($components);
+        }
+        if (is_array($components) && !$this->allInComponents($components)) {
+            for ($i = 0; $i < count($components); $i++) {
+                $this->foo($components[$i]);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Add a component to the components array.
      * @param   string $component
      * @return  bool
@@ -259,7 +277,8 @@ class Throttler
      */
     public function setGlobalThreshold($threshold)
     {
-        if (ThrottlerHelper::validateGlobalThreshold($threshold) && !$this->isActive()
+        if (ThrottlerHelper::validateGlobalThreshold($threshold)
+            && !$this->isActive()
             && $threshold > $this->getComponentThreshold()) {
             $this->globalThreshold = $threshold;
             return true;
@@ -307,7 +326,8 @@ class Throttler
      */
     public function setMetricFactor($times)
     {
-        if (ThrottlerHelper::validateMetricFactor($times) && !$this->isActive()) {
+        if (ThrottlerHelper::validateMetricFactor($times)
+            && !$this->isActive()) {
             $this->metricFactor = $times;
             return true;
         }
@@ -316,7 +336,7 @@ class Throttler
 
     /**
      * Component threshold getter.
-     * @return int
+     * @return int|null
      */
     public function getComponentThreshold()
     {
@@ -342,7 +362,7 @@ class Throttler
 
     /**
      * Components getter.
-     * @return array | null
+     * @return array
      */
     public function getComponents()
     {
@@ -350,13 +370,14 @@ class Throttler
     }
 
     /**
-     * Components setter.
+     * Components setter. It will overwrite $components array completely.
      * @param  array $components
      * @return bool
      */
     public function setComponents($components)
     {
-        if (ThrottlerHelper::validateComponents($components) && !$this->isActive()) {
+        if (ThrottlerHelper::validateComponents($components)
+            && !$this->isActive()) {
             $this->components = $components;
             return true;
         }
@@ -370,6 +391,16 @@ class Throttler
     public function getCounter()
     {
         return $this->counter;
+    }
+
+    /**
+     * Get the counter for a given component.
+     * @param  string $component
+     * @return int
+     */
+    public function getComponentCounter($component)
+    {
+        return $this->components[$component];
     }
 
     /**
@@ -399,14 +430,9 @@ class Throttler
         return microtime(true) > $this->getTimeExpiration();
     }
 
-    /**
-     * Get the counter for a given component.
-     * @param  string $component
-     * @return int
-     */
-    public function getComponentCounter($component)
+    private function foo($component)
     {
-        return $this->components[$component];
+        $this->components[$component] = 0;
     }
 
     /**
@@ -417,6 +443,16 @@ class Throttler
     private function inComponents($component)
     {
         return array_key_exists($component, $this->getComponents());
+    }
+
+    /**
+     * Check that all components in supplied array are in the instance components.
+     * @param  array $components
+     * @return bool
+     */
+    private function allInComponents($components)
+    {
+        return !in_array(false, array_map(array($this, "inComponents"), $components));
     }
 
     /**
@@ -516,7 +552,6 @@ class Throttler
      */
     private function componentsAreSet()
     {
-        return ThrottlerHelper::validateComponents($this->components)
-               && !empty($this->components);
+        return !empty($this->components);
     }
 }
