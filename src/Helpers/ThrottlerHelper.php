@@ -135,7 +135,7 @@ class ThrottlerHelper
      */
     public static function validateComponentsName($components)
     {
-        return !in_array(false, array_map(array(self, 'validateName'), $components));
+        return !in_array(false, array_map('self::validateName', $components));
     }
 
     /**
