@@ -31,28 +31,29 @@ class ThrottlerHelper
                                             $metricFactor, $componentThreshold,
                                             $components, $validMetrics)
     {
-        if (!self::validateName($name)) {
+        if (!self::validateName($name))
             throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $name: please supply a valid non-empty string.');
-        }
-        if (!self::validateGlobalThreshold($globalThreshold)) {
+
+        if (!self::validateGlobalThreshold($globalThreshold))
             throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $globalThreshold: please supply a positive integer.');
-        }
-        if (!self::validateMetric($metric, $validMetrics)) {
+
+        if (!self::validateMetric($metric, $validMetrics))
             throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $metric. Valid choices are "sec", "min", "hrs".');
-        }
-        if (!self::validateMetricFactor($metricFactor)) {
+
+        if (!self::validateMetricFactor($metricFactor))
             throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $metricFactor: please supply a positive integer.');
-        }
-        if (!self::validateComponentThreshold($componentThreshold)) {
+
+        if (!self::validateComponentThreshold($componentThreshold))
             throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $componentThreshold: please supply a positive integer or null.');
-        }
-        if (!self::compareThresholds($componentThreshold, $globalThreshold)) {
+
+        if (!self::compareThresholds($componentThreshold, $globalThreshold))
             throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $componentThreshold: $componentThreshold must be lower than $globalThreshold.');
 
-        }
-        if (!self::validateComponents($components)) {
+        if (!self::validateComponents($components))
             throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $components: $components must be an array.');
-        }
+
+        if (!self::validateComponentsName($components))
+            throw new \Franzip\Throttler\Exceptions\InvalidArgumentException('Invalid Throttler $components: $components entries must be non empty strings.');
     }
 
     /**
@@ -125,6 +126,26 @@ class ThrottlerHelper
     public static function validateComponents($components)
     {
         return is_array($components);
+    }
+
+    /**
+     * Check that all components entries are valid.
+     * @param  array $components
+     * @return bool
+     */
+    public static function validateComponentsName($components)
+    {
+        return !in_array(false, array_map(array(self, 'validateName'), $components));
+    }
+
+    /**
+     * Check that at least a component to track has been added.
+     * @param  array $components
+     * @return bool
+     */
+    public static function componentsAreSet($components)
+    {
+        return !empty($components);
     }
 
     private function __construct() {}
