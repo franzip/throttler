@@ -492,12 +492,12 @@ class Throttler
      * @param  string $component
      * @return bool
      */
-    private function allowedUpdate($component)
+    private function allowedUpdate($component, $hits)
     {
-        $globalCheck    = ($this->getCounter() + $hits) < $this->getGlobalThreshold();
+        $globalCheck    = ($this->getCounter() + $hits) <= $this->getGlobalThreshold();
         $componentCheck = true;
         if (null !== $this->getComponentThreshold()) {
-            $componentCheck = ($this->getComponentCounter($component) + $hits) < $this->getComponentThreshold();
+            $componentCheck = ($this->getComponentCounter($component) + $hits) <= $this->getComponentThreshold();
         }
         return $globalCheck && $componentCheck;
     }
