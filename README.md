@@ -46,8 +46,13 @@ getters (getName, getGlobalThreshold, etc.). See the constructor.
 ## Constructor
 ```php
 $throttler = new Throttler($name, $globalThreshold, $metric, $metricFactor = 1,
-                           $componentThreshold = null, $components = array())
+                           $componentThreshold = null, $components = array());
 ```
+
+## Allowed $metric
+- 'sec': Compute the timeframe in (seconds * $metricFactor)
+- 'min': Compute the timeframe in (minutes * $metricFactor)
+- 'hrs': Compute the timeframe in (hours   * $metricFactor)
 
 
 ## Basic Usage (default arguments)
@@ -83,6 +88,12 @@ if ($throttler->updateComponent('AddressToTrack1')) {
 } else {
     // handle update failure
 }
+
+$numOfRequests = 31;
+
+// will return false since the global limit is 30
+$throttler->updateComponent('AddressToTrack1', $numOfRequests);
+
 ...
 
 // Remove all stuff to track
@@ -124,6 +135,8 @@ if ($throttler->updateComponent('AddressToTrack1')) {
 
 ## isActive()
 
+Return whether tracking is turned on.
+
 ```php
 use Franzip\Throttler\Throttler;
 
@@ -132,7 +145,7 @@ $throttler = new Throttler('requests', 100, 'hrs');
 // false
 $throttler->isActive();
 
-// false. There's nothing to track yet.
+// false, there's nothing to track yet.
 $throttler->start();
 
 // false
@@ -140,13 +153,13 @@ $throttler->isActive();
 
 $throttler->addComponents(array('foo', 'bar'));
 
-// true
+// true, we have something to track
 $throttler->start();
 
 // true
 $throttler->isActive();
 
-// reset the instance (this will stop tracking)
+// reset the instance (this will also stop tracking)
 $throttler->reset();
 
 // false
@@ -154,7 +167,7 @@ $throttler->isActive();
 
 ```
 
-## Setters and reset()
+## reset()
 
 You can revert a `Throttler` object status to when it was instantiated.
 Just use the `reset()` method at anytime.
