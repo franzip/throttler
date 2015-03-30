@@ -2,7 +2,7 @@
 
 /**
  * Throttler -- Simple rate limiter and usage tracker component.
- * @version 0.1.1
+ * @version 0.2.0
  * @author Francesco Pezzella <franzpezzella@gmail.com>
  * @link https://github.com/franzip/throttler
  * @copyright Copyright 2015 Francesco Pezzella

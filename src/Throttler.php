@@ -2,7 +2,7 @@
 
 /**
  * Throttler -- Simple rate limiter and usage tracker component.
- * @version 0.1.1
+ * @version 0.2.0
  * @author Francesco Pezzella <franzpezzella@gmail.com>
  * @link https://github.com/franzip/throttler
  * @copyright Copyright 2015 Francesco Pezzella
@@ -14,7 +14,6 @@ namespace Franzip\Throttler;
 use Franzip\Throttler\Helpers\ThrottlerHelper;
 
 /**
- * TOMODIFY
  * This class implements a dead simple usage/time tracker.
  * Usage is capped with a global threshold and, if supplied, with a component based
  * threshold. In the specified timeframe (1 minute, 30 seconds, etc),
@@ -199,7 +198,7 @@ class Throttler
 
     /**
      * Add entries to the components array.
-     * Allow single add (with a string arg) and bulk adding (with an array arg)
+     * Allow single add (with a string arg) and bulk adding (with an array arg).
      * @param  string|array $components
      * @return bool
      */
@@ -423,7 +422,7 @@ class Throttler
     }
 
     /**
-     * Add a component to the components array
+     * Add a component to the components array.
      * @param string $component
      */
     private function addComponent($component)
@@ -452,7 +451,7 @@ class Throttler
     }
 
     /**
-     * Increase the global counter
+     * Increase the global counter.
      */
     private function increaseGlobalCounter()
     {
@@ -469,7 +468,7 @@ class Throttler
     }
 
     /**
-     * Turn tracking off
+     * Turn tracking off.
      */
     private function turnOff()
     {
@@ -477,7 +476,7 @@ class Throttler
     }
 
     /**
-     * Turn tracking on
+     * Turn tracking on.
      */
     private function turnOn()
     {

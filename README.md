@@ -14,7 +14,7 @@ Create a composer.json file in your project root:
 ```
 {
     "require": {
-        "franzip/throttler": "0.1.*@dev"
+        "franzip/throttler": "0.2.*@dev"
     }
 }
 ```
@@ -107,7 +107,8 @@ use Franzip\Throttler\Throttler;
 // Max 100 total requests per day
 // Max 10 requests from each tracked address per day
 $throttler = new Throttler('requests', 100, 'hrs', 24,
-                           10, array('AddressToTrack1', 'AddressToTrack2',
+                           10, array('AddressToTrack1',
+                                     'AddressToTrack2',
                                      ...));
 
 // Start tracking (timeframe starts now)
@@ -127,14 +128,27 @@ if ($throttler->updateComponent('AddressToTrack1')) {
 use Franzip\Throttler\Throttler;
 
 $throttler = new Throttler('requests', 100, 'hrs');
+
 // false
 $throttler->isActive();
 
+// false. There's nothing to track yet.
 $throttler->start();
+
+// false
+$throttler->isActive();
+
+$throttler->addComponents(array('foo', 'bar'));
+
+// true
+$throttler->start();
+
 // true
 $throttler->isActive();
 
+// reset the instance (this will stop tracking)
 $throttler->reset();
+
 // false
 $throttler->isActive();
 
@@ -172,7 +186,7 @@ $throttler->getMetric();
 - [x] Move validation to external class.
 - [x] Allow bulk components adding.
 - [ ] Refactoring messy tests.
-- [ ] Total refactoring update-checking methods.
+- [ ] Refactoring update-checking methods.
 
 ## License
 [MIT](http://opensource.org/licenses/MIT/ "MIT") Public License.
