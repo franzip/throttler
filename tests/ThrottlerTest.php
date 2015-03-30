@@ -199,6 +199,7 @@ class GeneralTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($withDefaults->setMetricFactor(15));
         $this->assertFalse($withDefaults->setComponentThreshold(3));
         $this->assertFalse($withDefaults->setComponents(array('foo')));
+
         $withComponents = new Throttler($this->args['withComponents'][0],
                                         $this->args['withComponents'][1],
                                         $this->args['withComponents'][2],
@@ -289,6 +290,7 @@ class GeneralTest extends PHPUnit_Framework_TestCase
         $this->assertNull($withDefaults->getComponentThreshold());
         $this->assertEquals($withDefaults->getMetricFactor(), 1);
         $this->assertEquals($withDefaults->getComponents(), array());
+
         $withComponents = new Throttler($this->args['withComponents'][0],
                                         $this->args['withComponents'][1],
                                         $this->args['withComponents'][2],
@@ -364,10 +366,10 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withDefaults->addComponents('foo'));
         $this->assertTrue($withDefaults->start());
         $this->assertFalse($withDefaults->updateComponent('bar'));
-        for ($i = 0; $i < $withDefaults->getGlobalThreshold(); $i++)
-        {
-            $this->assertTrue($withDefaults->updateComponent('foo'));
-        }
+        $this->assertFalse($withDefaults->updateComponent('bar', 'baz'));
+        $this->assertFalse($withDefaults->updateComponent('bar', 0));
+        $this->assertTrue($withDefaults->updateComponent('foo',
+                          $withDefaults->getGlobalThreshold()));
         $this->assertFalse($withDefaults->updateComponent('foo'));
         $this->assertFalse($withDefaults->updateComponent('bar'));
         $this->assertEquals($withDefaults->getComponentCounter('foo'), 2);
@@ -376,15 +378,14 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withDefaults->addComponents('foobar'));
         $this->assertTrue($withDefaults->setGlobalThreshold(10));
         $this->assertTrue($withDefaults->start());
-        for ($i = 0; $i < $withDefaults->getGlobalThreshold(); $i++)
-        {
-            $this->assertTrue($withDefaults->updateComponent('foobar'));
-        }
+        $this->assertTrue($withDefaults->updateComponent('foobar',
+                          $withDefaults->getGlobalThreshold()));
         $this->assertFalse($withDefaults->updateComponent('foobar'));
         $this->assertEquals($withDefaults->getCounter(), 10);
         $withDefaults->reset();
         $this->assertEquals($withDefaults->getGlobalThreshold(), 2);
         $this->assertEquals($withDefaults->getComponents(), array());
+
         $withComponents = new Throttler($this->args['withComponents'][0],
                                         $this->args['withComponents'][1],
                                         $this->args['withComponents'][2],
@@ -393,9 +394,8 @@ class TrackingTest extends PHPUnit_Framework_TestCase
                                         $this->args['withComponents'][5]);
         $this->assertFalse($withComponents->updateComponent('baz'));
         $this->assertTrue($withComponents->start());
-        for ($i = 0; $i < $withComponents->getComponentThreshold(); $i++) {
-            $this->assertTrue($withComponents->updateComponent('foo'));
-        }
+        $this->assertTrue($withComponents->updateComponent('foo',
+                          $withComponents->getComponentThreshold()));
         $this->assertTrue($withComponents->updateComponent('bar'));
         $this->assertFalse($withComponents->updateComponent('foo'));
         $this->assertFalse($withComponents->updateComponent('bar'));
@@ -407,15 +407,12 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withComponents->setGlobalThreshold(15));
         $this->assertTrue($withComponents->setComponentThreshold(5));
         $this->assertTrue($withComponents->start());
-        for ($i = 0; $i < $withComponents->getComponentThreshold(); $i++) {
-            $this->assertTrue($withComponents->updateComponent('foobar'));
-        }
-        for ($i = 0; $i < $withComponents->getComponentThreshold(); $i++) {
-            $this->assertTrue($withComponents->updateComponent('foo'));
-        }
-        for ($i = 0; $i < $withComponents->getComponentThreshold(); $i++) {
-            $this->assertTrue($withComponents->updateComponent('bar'));
-        }
+        $this->assertTrue($withComponents->updateComponent('foobar',
+                          $withComponents->getComponentThreshold()));
+        $this->assertTrue($withComponents->updateComponent('foo',
+                          $withComponents->getComponentThreshold()));
+        $this->assertTrue($withComponents->updateComponent('bar',
+                          $withComponents->getComponentThreshold()));
         $this->assertFalse($withComponents->updateComponent('foobar'));
         $this->assertFalse($withComponents->updateComponent('bar'));
         $withComponents->reset();
@@ -436,9 +433,8 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withComponents->updateComponent('foo'));
         $this->assertFalse($withComponents->updateComponent('barz'));
         $this->assertTrue($withComponents->start());
-        for ($i = 0; $i < $withComponents->getComponentThreshold(); $i++) {
-            $this->assertTrue($withComponents->updateComponent('foo'));
-        }
+        $this->assertTrue($withComponents->updateComponent('foo',
+                          $withComponents->getComponentThreshold()));
         $this->assertEquals($withComponents->getCounter(), 10);
         $this->assertEquals($withComponents->getComponentCounter('foo'), 10);
         $this->assertFalse($withComponents->updateComponent('foo'));
@@ -459,7 +455,6 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withComponents->getGlobalThreshold(), 11);
         $this->assertEquals($withComponents->getComponentThreshold(), 10);
 
-
         $withComponents1 = new Throttler($this->args['withComponents1'][0],
                                          $this->args['withComponents1'][1],
                                          $this->args['withComponents1'][2],
@@ -469,12 +464,10 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($withComponents1->stop());
         $this->assertTrue($withComponents1->start());
         $this->assertFalse($withComponents1->updateComponent('baz'));
-        for ($i = 0; $i < $withComponents1->getComponentThreshold(); $i++)
-        {
-            $this->assertTrue($withComponents1->updateComponent('foo'));
-            $this->assertTrue($withComponents1->updateComponent('bar'));
-
-        }
+        $this->assertTrue($withComponents1->updateComponent('foo',
+                          $withComponents1->getComponentThreshold()));
+        $this->assertTrue($withComponents1->updateComponent('bar',
+                          $withComponents1->getComponentThreshold()));
         $this->assertEquals($withComponents1->getComponentCounter('foo'), 5);
         $this->assertEquals($withComponents1->getComponentCounter('bar'), 5);
         $this->assertEquals($withComponents1->getCounter(), 10);
@@ -491,6 +484,7 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withComponents1->getComponents(), array('foo', 'bar'));
         $this->assertEquals($withComponents1->getGlobalThreshold(), 11);
         $this->assertEquals($withComponents1->getComponentThreshold(), 5);
+
         $withComponents2 = new Throttler($this->args['withComponents2'][0],
                                          $this->args['withComponents2'][1],
                                          $this->args['withComponents2'][2],
@@ -499,20 +493,26 @@ class TrackingTest extends PHPUnit_Framework_TestCase
                                          $this->args['withComponents2'][5]);
         $this->assertFalse($withComponents2->stop());
         $this->assertTrue($withComponents2->start());
-        for ($i = 0; $i < $withComponents2->getComponentThreshold(); $i++) {
-            $this->assertTrue($withComponents2->updateComponent('foo'));
-            $this->assertTrue($withComponents2->updateComponent('bar'));
-            $this->assertTrue($withComponents2->updateComponent('foobar'));
-            $this->assertTrue($withComponents2->updateComponent('foobaz'));
-            $this->assertTrue($withComponents2->updateComponent('barfoo'));
-        }
-        for ($i = 0; $i < $withComponents2->getComponentThreshold(); $i++) {
-            $this->assertFalse($withComponents2->updateComponent('foo'));
-            $this->assertFalse($withComponents2->updateComponent('bar'));
-            $this->assertFalse($withComponents2->updateComponent('foobar'));
-            $this->assertFalse($withComponents2->updateComponent('foobaz'));
-            $this->assertFalse($withComponents2->updateComponent('barfoo'));
-        }
+        $this->assertTrue($withComponents2->updateComponent('foo',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertTrue($withComponents2->updateComponent('bar',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertTrue($withComponents2->updateComponent('foobar',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertTrue($withComponents2->updateComponent('foobaz',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertTrue($withComponents2->updateComponent('barfoo',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertFalse($withComponents2->updateComponent('foo',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertFalse($withComponents2->updateComponent('bar',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertFalse($withComponents2->updateComponent('foobar',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertFalse($withComponents2->updateComponent('foobaz',
+                          $withComponents2->getComponentThreshold()));
+        $this->assertFalse($withComponents2->updateComponent('barfoo',
+                          $withComponents2->getComponentThreshold()));
         $this->assertTrue($withComponents2->stop());
         $this->assertTrue($withComponents2->resume());
         $this->assertFalse($withComponents2->resume());
@@ -542,9 +542,8 @@ class TrackingTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($withDefaults->start());
         $this->assertEquals($withDefaults->getTimeExpiration(),
                             $withDefaults->getTimeStart() + 1);
-        for ($i = 0; $i < $withDefaults->getGlobalThreshold(); $i++) {
-            $this->assertTrue($withDefaults->updateComponent('foo'));
-        }
+        $this->assertTrue($withDefaults->updateComponent('foo',
+                          $withDefaults->getGlobalThreshold()));
         $this->assertFalse($withDefaults->updateComponent('foo'));
         $this->assertEquals($withDefaults->getCounter(),
                             $withDefaults->getGlobalThreshold());

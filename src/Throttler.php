@@ -170,17 +170,19 @@ class Throttler
     }
 
     /**
-     * This is the main class method.
-     * If the timeframe is expired, the object will simply be refreshed and a
-     * new time window will be set accordingly.
-     * If tracking has been stopped, the method will simply return true.
-     * Otherwise, check if the update is allowed.
+     * If the timeframe is expired, the update is to be allowed and the instance
+     * will simply be refreshed and a new time window will be set accordingly.
+     * If tracking has been stopped, the method will simply return true without
+     * updating the instance counters.
+     * Otherwise, it will be checked whether the update of given $hits is to
+     * be allowed and the instance counters will be updated accordingly.
      * @param  string $component
+     * @param  int    $hits
      * @return bool
      */
-    public function updateComponent($component)
+    public function updateComponent($component, $hits = 1)
     {
-        if (!$this->inComponents($component))
+        if (!$this->inComponents($component) || !is_int($hits) || $hits < 1)
             return false;
         if (!$this->isActive())
             return true;
@@ -188,9 +190,9 @@ class Throttler
             $this->refreshInstance();
             return true;
         }
-        if ($this->allowedUpdate($component)) {
-            $this->increaseGlobalCounter();
-            $this->increaseComponentCounter($component);
+        if ($this->allowedUpdate($component, $hits)) {
+            $this->increaseGlobalCounter($hits);
+            $this->increaseComponentCounter($component, $hits);
             return true;
         }
         return false;
@@ -452,19 +454,21 @@ class Throttler
 
     /**
      * Increase the global counter.
+     * @param  int $hits
      */
-    private function increaseGlobalCounter()
+    private function increaseGlobalCounter($hits)
     {
-        $this->counter++;
+        $this->counter += $hits;
     }
 
     /**
      * Increase the counter for a given component.
      * @param  string $component
+     * @param  int    $hits
      */
-    private function increaseComponentCounter($component)
+    private function increaseComponentCounter($component, $hits)
     {
-        $this->components[$component]++;
+        $this->components[$component] += $hits;
     }
 
     /**
@@ -490,10 +494,10 @@ class Throttler
      */
     private function allowedUpdate($component)
     {
-        $globalCheck    = $this->getCounter() < $this->getGlobalThreshold();
+        $globalCheck    = ($this->getCounter() + $hits) < $this->getGlobalThreshold();
         $componentCheck = true;
         if (null !== $this->getComponentThreshold()) {
-            $componentCheck = $this->getComponentCounter($component) < $this->getComponentThreshold();
+            $componentCheck = ($this->getComponentCounter($component) + $hits) < $this->getComponentThreshold();
         }
         return $globalCheck && $componentCheck;
     }
