@@ -144,7 +144,7 @@ class ExceptionsTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class ThrottleTest extends PHPUnit_Framework_TestCase
+class GeneralTest extends PHPUnit_Framework_TestCase
 {
     protected $args;
 
@@ -161,6 +161,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $withDefaults = new Throttler($this->args['withDefault'][0],
                                       $this->args['withDefault'][1],
                                       $this->args['withDefault'][2]);
+        $this->assertInstanceOf('\Franzip\Throttler\Throttler', $withDefaults);
         $this->assertNull($withDefaults->getCounter());
         $this->assertNull($withDefaults->getTimeStart());
         $this->assertEquals($withDefaults->getName(), 'test');
@@ -204,6 +205,7 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
                                         $this->args['withComponents'][3],
                                         $this->args['withComponents'][4],
                                         $this->args['withComponents'][5]);
+        $this->assertInstanceOf('\Franzip\Throttler\Throttler', $withComponents);
         $this->assertNull($withComponents->getCounter());
         $this->assertNull($withComponents->getTimeStart());
         $this->assertEquals($withComponents->getName(), 'test');
@@ -332,6 +334,25 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withComponents->getMetricFactor(), 2);
         $this->assertEquals($withComponents->getComponents(), array('foo', 'bar'));
     }
+}
+
+class TrackingTest extends PHPUnit_Framework_TestCase
+{
+    protected $args;
+
+    protected function setUp()
+    {
+        $withDefaults    = array('test', 2, 'min');
+        $withComponents  = array('test', 11, 'MIn', 2, 10, array('foo', 'bar'));
+        $withComponents1 = array('foo', 11, 'hrs', 1, 5, array('foo', 'bar'));
+        $withComponents2 = array('foo', 6, 'hrs', 1, 1, array('foo', 'bar',
+                                                              'foobar', 'foobaz',
+                                                              'barfoo'));
+        $this->args = array('withDefault'     => $withDefaults,
+                            'withComponents'  => $withComponents,
+                            'withComponents1' => $withComponents1,
+                            'withComponents2' => $withComponents2);
+    }
 
     public function testGlobalThrottling()
     {
@@ -439,7 +460,12 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withComponents->getComponentThreshold(), 10);
 
 
-        $withComponents1 = new Throttler('foo', 11, 'hrs', 1, 5, array('foo', 'bar'));
+        $withComponents1 = new Throttler($this->args['withComponents1'][0],
+                                         $this->args['withComponents1'][1],
+                                         $this->args['withComponents1'][2],
+                                         $this->args['withComponents1'][3],
+                                         $this->args['withComponents1'][4],
+                                         $this->args['withComponents1'][5]);
         $this->assertFalse($withComponents1->stop());
         $this->assertTrue($withComponents1->start());
         $this->assertFalse($withComponents1->updateComponent('baz'));
@@ -465,11 +491,12 @@ class ThrottleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($withComponents1->getComponents(), array('foo', 'bar'));
         $this->assertEquals($withComponents1->getGlobalThreshold(), 11);
         $this->assertEquals($withComponents1->getComponentThreshold(), 5);
-        $withComponents2 = new Throttler('foo', 6, 'hrs', 1, 1, array('foo',
-                                                                      'bar',
-                                                                      'foobar',
-                                                                      'foobaz',
-                                                                      'barfoo'));
+        $withComponents2 = new Throttler($this->args['withComponents2'][0],
+                                         $this->args['withComponents2'][1],
+                                         $this->args['withComponents2'][2],
+                                         $this->args['withComponents2'][3],
+                                         $this->args['withComponents2'][4],
+                                         $this->args['withComponents2'][5]);
         $this->assertFalse($withComponents2->stop());
         $this->assertTrue($withComponents2->start());
         for ($i = 0; $i < $withComponents2->getComponentThreshold(); $i++) {
