@@ -199,6 +199,17 @@ class Throttler
     }
 
     /**
+     * Restart all counters and state variables.
+     */
+    public function refreshInstance()
+    {
+        $this->counter    = 0;
+        $this->startedAt  = microtime(true);
+        $this->expiresAt  = $this->computeExpiration();
+        $this->setUpComponents($this->components);
+    }
+
+    /**
      * Add entries to the components array.
      * Allow single add (with a string arg) and bulk adding (with an array arg).
      * @param  string|array $components
@@ -510,17 +521,6 @@ class Throttler
     {
         $delta = self::$timeFactor[$this->getMetric()] * $this->getMetricFactor();
         return $this->getTimeStart() + $delta;
-    }
-
-    /**
-     * Restart all counters and state variables when the timeframe is expired.
-     */
-    private function refreshInstance()
-    {
-        $this->counter    = 0;
-        $this->startedAt  = microtime(true);
-        $this->expiresAt  = $this->computeExpiration();
-        $this->setUpComponents($this->components);
     }
 
     /**
