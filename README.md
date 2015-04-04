@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/franzip/throttler.svg?branch=master)](https://travis-ci.org/franzip/throttler)
+[![Coverage Status](https://coveralls.io/repos/franzip/throttler/badge.svg?branch=master)](https://coveralls.io/r/franzip/throttler?branch=master)
 
 # Throttler
 A simple, general purpose, rate limiter and usage tracker library.
