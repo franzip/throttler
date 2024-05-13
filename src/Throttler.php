@@ -84,7 +84,7 @@ class Throttler
     // perform basic validation
     ThrottlerHelper::validateConstructorArgs($name, $globalThreshold, $metric,
                                              $metricFactor, $componentThreshold,
-                                             $components, self::$timeFactor);
+                                             $components, self::class::$timeFactor);
     // instance vars
     $this->name               = $name;
     $this->globalThreshold    = $globalThreshold;
@@ -527,7 +527,7 @@ class Throttler
    */
   private function computeExpiration()
   {
-    $delta = self::$timeFactor[$this->getMetric()] * $this->getMetricFactor();
+    $delta = self::class::$timeFactor[$this->getMetric()] * $this->getMetricFactor();
     return $this->getTimeStart() + $delta;
   }
 

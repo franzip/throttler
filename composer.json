@@ -10,20 +10,24 @@
     "email": "franzpezzella@gmail.com"
   }],
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=8.0.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "4.0.*",
-    "satooshi/php-coveralls": "dev-master"
+    "phpunit/phpunit": "11.x.*"
   },
   "autoload": {
     "psr-4": {
       "Franzip\\Throttler\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Franzip\\Throttler\\": "test/"
+    }
+  },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.2.x-dev"
+      "dev-master": "1.0.x-dev"
     }
   }
 }
