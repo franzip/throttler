@@ -22,7 +22,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Franzip\\Throttler\\": "tests/"
+      "Franzip\\Throttler\\": "test/"
     }
   },
   "extra": {
