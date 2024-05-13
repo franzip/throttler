@@ -13,17 +13,21 @@
     "php": ">=8.0.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "11.x.*",
-    "php-coveralls/php-coveralls": "2.7.*"
+    "phpunit/phpunit": "11.x.*"
   },
   "autoload": {
     "psr-4": {
       "Franzip\\Throttler\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Franzip\\Throttler\\": "tests/"
+    }
+  },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.2.x-dev"
+      "dev-master": "1.0.x-dev"
     }
   }
 }
