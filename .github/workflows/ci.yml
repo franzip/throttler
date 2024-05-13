@@ -12,5 +12,9 @@ jobs:
     - uses: php-actions/phpunit@master
       with:
         php_version: "8.3"
+        php_extensions: xdebug
         bootstrap: vendor/autoload.php
         configuration: test/phpunit.xml
+        args: --coverage-text
+      env:
+        XDEBUG_MODE: coverage
