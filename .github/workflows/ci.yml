@@ -13,8 +13,9 @@ jobs:
       with:
         php_version: "8.3"
         php_extensions: xdebug
+        coverage_text: true
         bootstrap: vendor/autoload.php
         configuration: test/phpunit.xml
-        args: --coverage-text
+        args: --coverage-filter src test
       env:
         XDEBUG_MODE: coverage
